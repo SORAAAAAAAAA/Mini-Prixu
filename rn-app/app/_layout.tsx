@@ -1,34 +1,28 @@
 import { Slot, useRouter, useSegments } from 'expo-router';
 import { useEffect } from 'react';
-import { AuthProvider, useAuth } from './context/authContext'; 
+import { AuthProvider, useAuth } from '../context/authContext'; 
 import { StatusBar } from 'expo-status-bar';
 
-// 1. This is the "Bouncer" (The Guard Logic)
-// It only cares about checking if the user is allowed here.
 function RootLayoutNav() {
-  const { session } = useAuth()!;
+  const auth = useAuth();
   const router = useRouter();
+  const segments = useSegments();
 
   useEffect(() => {
-  const timer = setTimeout(() => {
-    if (!session) {
-      router.replace('/');
-    } else if (session) {
-      router.replace('/(app)/(tabs)/home');
+    if (!auth?.loading) {
+      // App is initialized
+      const inProtectedGroup = segments[0] === '(app)';
+      if (!auth?.session && inProtectedGroup) {
+        router.replace('/signin');
+      } else if (auth?.session && !inProtectedGroup) {
+        router.replace('/(app)/(tabs)/home');
+      }
     }
-  }, 10000); // 10000ms delay
+  }, [auth?.loading, auth?.session, router, segments]);
 
-  return () => clearTimeout(timer);
-}, [session]);
-
-  return (
-    <Slot />
-  );
+  return <Slot />;
 }
 
-
-// 2. This is the "Main Gate" (The Root Export)
-// Its ONLY job is to wrap the Bouncer with the Backpack (Provider).
 export default function RootLayout() {
   return (
     <AuthProvider>

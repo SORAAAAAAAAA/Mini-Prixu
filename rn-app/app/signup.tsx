@@ -4,6 +4,7 @@ import {
   Text, 
   TextInput, 
   TouchableOpacity, 
+  StyleSheet, 
   KeyboardAvoidingView, 
   Platform,
   TouchableWithoutFeedback,
@@ -11,32 +12,43 @@ import {
   ActivityIndicator
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Link } from 'expo-router';
-import { useAuth } from '../context/authContext'; 
+import { Link, useRouter } from 'expo-router';
+import { useAuth } from '../context/authContext';
 import { styles } from '../styles/Signin';
+import { isValidEmail, isValidPassword, isNonEmptyString } from '../validators/authValidator';
 
-export default function SignIn() {
-
-  const auth = useAuth();
-
-  if (!auth) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  const { signIn } = auth; // Get the signIn function from context
+export default function SignUp() {
   
+  const { signIn } = useAuth(); // Get the signIn function from context 
   
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [signupError, setSignupError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const handleSignUp = async () => {
 
-  const handleSignIn = async () => {
+    // Validate Input 
+    if (!isValidEmail(email)) {
+      alert('Please enter a valid email address.');
+      return;
+    }
 
-    setLoading(true);
-    // Call signIn from context
-    const userData = { email, password };
-    await signIn(userData); 
-    setLoading(false);
+    if (!isValidPassword(password)) {
+      alert('Password must be at least 6 characters long.');
+      return;
+    }
+
+    if (!isNonEmptyString(name)) {
+      alert('Name cannot be empty.');
+      return;
+    }
+
+    if (signupError) {
+      alert(signupError);
+      return;
+    }
     
   };
 
@@ -51,7 +63,7 @@ export default function SignIn() {
         }}
       >
         <ActivityIndicator size="large" color="#edaa18" />
-        <Text style={{ marginTop: 16, fontSize: 16, color: '#666' }}>Signing in...</Text>
+        <Text style={{ marginTop: 16, fontSize: 16, color: '#666' }}>Creating your account...</Text>
       </SafeAreaView>
     ) : (
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
@@ -59,11 +71,19 @@ export default function SignIn() {
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           style={styles.container}
         >
+          
           <View style={styles.formContainer}>
-            <Text style={styles.title}>Welcome Back!</Text>
-            <Text style={styles.subtitle}>Please sign in to continue.</Text>
+            <Text style={styles.title}>Create an Account</Text>
+            <Text style={styles.subtitle}>Join now and get your Business ready for rewards.</Text>
 
-            {/* Email Input */}
+            <TextInput
+              style={styles.input}
+              placeholder="Full Name"
+              placeholderTextColor="#aaa"
+              value={name}
+              onChangeText={setName}
+            />
+
             <TextInput
               style={styles.input}
               placeholder="Email Address"
@@ -74,31 +94,30 @@ export default function SignIn() {
               keyboardType="email-address"
             />
 
-            {/* Password Input */}
             <TextInput
               style={styles.input}
               placeholder="Password"
               placeholderTextColor="#aaa"
               value={password}
               onChangeText={setPassword}
-              secureTextEntry // Hides the text
+              secureTextEntry
             />
 
-            {/* Sign In Button */}
-            <TouchableOpacity style={styles.button} onPress={handleSignIn}>
-              <Text style={styles.buttonText}>Sign In</Text>
+            <TouchableOpacity style={styles.button} onPress={handleSignUp}>
+              <Text style={styles.buttonText}>Sign Up</Text>
             </TouchableOpacity>
 
-            {/* Link to Sign Up */}
             <View style={styles.footer}>
-              <Text style={styles.footerText}>Don&apos;t have an account? </Text>
-              <Link href="/signup" asChild>
+              <Text style={styles.footerText}>Already have an account? </Text>
+              {/* Link back to Sign In */}
+              <Link href="/signin" asChild>
                 <TouchableOpacity>
-                  <Text style={styles.link}>Sign Up</Text>
+                  <Text style={styles.link}>Sign In</Text>
                 </TouchableOpacity>
               </Link>
             </View>
           </View>
+          
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
     )

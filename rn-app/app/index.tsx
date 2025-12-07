@@ -14,34 +14,33 @@ import { useRouter } from 'expo-router';
 import slides from '../data/carouselData';
 import Button from '../components/ui/button';
 
-// 1. Define the Interface for your Slide Data
+// Interface for Slide Item
 interface SlideItem {
   id: string;
   description: string;
-  image?: ImageSourcePropType; // Optional if you don't have images yet
+  image?: ImageSourcePropType; 
 }
 
-
+// Onboarding Screen Component
 export default function OnboardingScreen() {
   const { width } = useWindowDimensions();
   const router = useRouter();
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // 3. Type the FlatList Ref (Optional, but good practice if you need to control scroll programmatically)
+  // Flatlist Ref
   const slidesRef = useRef<FlatList<SlideItem>>(null);
 
-  // 4. Type the 'viewableItemsChanged' callback
-  // This is the tricky part in TS. It needs specific types for the viewable items.
+  // Viewable Items Changed Handler
   const viewableItemsChanged = useRef(({ viewableItems }: { viewableItems: ViewToken[] }) => {
     if (viewableItems.length > 0 && viewableItems[0].index !== null) {
       setCurrentIndex(viewableItems[0].index);
     }
   }).current;
 
-  // 5. Configuration ref (No special types needed usually, but good to keep const)
+  // Viewability Config
   const viewConfig = useRef({ viewAreaCoveragePercentThreshold: 50 }).current;
 
-  // 6. Strongly typed RenderItem component
+  // Render Item for FlatList
   const renderItem: ListRenderItem<SlideItem> = ({ item }) => (
     <View style={[styles.slide, { width }]}>
       <View style={styles.imageContainer}>
