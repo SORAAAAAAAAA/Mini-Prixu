@@ -2,12 +2,14 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Text } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import logIn from '../utils/apiCall/api.signin';
+import logUp from '../utils/apiCall/api.signup';
 
 type AuthContextType = {
     signIn: (data: any) => Promise<void>;
-    signOut: (data: any) => Promise<void>;
+    signUp: (data: any) => Promise<void>;
+    signOut: () => Promise<void>;
     session: any;
-    user: any;  
     loading: boolean; 
 }
 
@@ -22,7 +24,6 @@ const AuthContext = createContext<AuthContextType | null>(null);
 const AuthProvider = ({children} : {children: React.ReactNode}) => {
     const [loading, setLoading] = useState(false);
     const [session, setSession] = useState(false);
-    const [user, setUser] = useState<UserType | null>(null);
 
     useEffect(() => {
         const initializeApp = async () => {
@@ -48,18 +49,59 @@ const AuthProvider = ({children} : {children: React.ReactNode}) => {
     }, []);
 
     const signIn = async (data: any ) => {
-        // Implement sign-in logic here
+        setLoading(true);
+
+        try {
+            const response = await logIn(data.email, data.password);
+
+            if (response.ok) {
+                const responseData = await response.json();
+                setSession(true);
+                await SecureStore.setItemAsync('userSession', JSON.stringify(responseData));
+            } else {
+                const error = await response.json()
+                alert(error.error);
+            }
+
+        } catch (error) {
+            console.error('Error signing in:', error);
+        } finally {
+            setLoading(false);
+        }
     }
 
-    const signOut = async (data: any) => {
+    const signUp = async (data: any) => {
+        setLoading(true);
+
+        try {
+            const response = await logUp(data.name, data.email, data.password);
+            console.log(response);
+            
+            if (response.ok) {
+                const responseData = await response.json();
+                setSession(true);
+                await SecureStore.setItemAsync('userSession', JSON.stringify(responseData));
+                return responseData.user;
+            } else {
+                const error = await response.json()
+                alert(error.error);
+            }
+
+        } catch (error) {
+            console.error('Error signing up:', error);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    const signOut = async () => {
         // Implement sign-out logic here
         await SecureStore.deleteItemAsync('userSession');
         setSession(false);
-        setUser(null);
     }
 
     return (
-        <AuthContext.Provider value={{signIn, signOut, session, user, loading}}>
+        <AuthContext.Provider value={{signIn, signUp, signOut, session, loading}}>
             {loading ? (
                 <SafeAreaView
                     style={{

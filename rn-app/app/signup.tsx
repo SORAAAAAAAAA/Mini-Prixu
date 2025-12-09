@@ -4,7 +4,6 @@ import {
   Text, 
   TextInput, 
   TouchableOpacity, 
-  StyleSheet, 
   KeyboardAvoidingView, 
   Platform,
   TouchableWithoutFeedback,
@@ -12,14 +11,14 @@ import {
   ActivityIndicator
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Link, useRouter } from 'expo-router';
+import { Link } from 'expo-router';
 import { useAuth } from '../context/authContext';
 import { styles } from '../styles/Signin';
 import { isValidEmail, isValidPassword, isNonEmptyString } from '../validators/authValidator';
 
 export default function SignUp() {
   
-  const { signIn } = useAuth(); // Get the signIn function from context 
+  const { signUp } = useAuth(); // Get the signUp function from context 
   
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -45,6 +44,16 @@ export default function SignUp() {
       return;
     }
 
+    try {
+      setLoading(true);
+      // Call signUp from context
+      const userData = { name, email, password };
+      await signUp(userData); 
+      setLoading(false);
+    } catch (error: any) {
+      setSignupError(error.message);
+    }
+  
     if (signupError) {
       alert(signupError);
       return;
