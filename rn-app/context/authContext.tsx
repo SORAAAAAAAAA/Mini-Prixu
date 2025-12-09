@@ -13,6 +13,7 @@ type AuthContextType = {
     loading: boolean; 
 }
 
+// User type definition
 type UserType = {
     id: string;
     name: string;
@@ -28,7 +29,6 @@ const AuthProvider = ({children} : {children: React.ReactNode}) => {
     useEffect(() => {
         const initializeApp = async () => {
             try {
-                await SecureStore.deleteItemAsync('userSession');
                 // Check for existing session in storage
                 const storedSession = await SecureStore.getItemAsync('userSession');
                 console.log(storedSession);

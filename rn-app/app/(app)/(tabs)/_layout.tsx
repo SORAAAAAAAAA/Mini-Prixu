@@ -5,7 +5,6 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        headerShown: true,
         tabBarActiveTintColor: '#007AFF',
         tabBarInactiveTintColor: '#999',
       }}
@@ -13,25 +12,22 @@ export default function TabLayout() {
       <Tabs.Screen
         name="home"
         options={{
-          title: 'Home',
+          headerShown: false,
           tabBarIcon: ({ color }) => <MaterialIcons name="home" size={24} color={color} />,
-          headerTitle: 'Home',
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
-          title: 'Profile',
+          headerShown: false,
           tabBarIcon: ({ color }) => <MaterialIcons name="person" size={24} color={color} />,
-          headerTitle: 'Profile',
         }}
       />
       <Tabs.Screen
         name="settings"
         options={{
-          title: 'Settings',
+          headerShown: false,
           tabBarIcon: ({ color }) => <MaterialIcons name="settings" size={24} color={color} />,
-          headerTitle: 'Settings',
         }}
       />
     </Tabs>

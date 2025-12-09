@@ -1,18 +1,11 @@
 import React from 'react';
-import { Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import HomeScreen from '../../../components/screens/homeScreen';
 
-export default function SignIn() {
+export default function Home() {
   return (
-    <SafeAreaView
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: 'white'
-      }}
-    >
-      <Text>Home Screen</Text>
+    <SafeAreaView style={{ flex: 1 }}>
+      <HomeScreen />
     </SafeAreaView>
   );
 }
